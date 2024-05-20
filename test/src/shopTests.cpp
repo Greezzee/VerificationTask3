@@ -35,6 +35,16 @@ TEST(AddNewBookToShop, AddOneBook)
     ASSERT_EQ(catalog[book.getId()], 1);
 }
 
+TEST(AddNewBookToShop, AddZeroBooks)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+
+    shop.addBook(book, 0);
+    auto catalog = shop.getCatalog();
+    ASSERT_TRUE(catalog.empty());
+}
+
 TEST(AddNewBookToShop, AddSeveralEqualBooks)
 {
     bookshop::Bookshop shop;
