@@ -2,6 +2,7 @@
 #define CART_H_
 
 #include <vector>
+#include <map>
 #include "book.hpp"
 
 namespace bookshop {
@@ -16,10 +17,11 @@ namespace bookshop {
     public:
         Cart();
 
-        void addBook(BookID book_id, size_t count = 0);
+        void addBook(BookID book_id, size_t count = 1);
 
         std::vector<BookOrder> getAllOrderedBooks();
-
+    private:
+        std::map<BookID, size_t> m_content;
     };
 
 } // namespace bookshop

@@ -1,5 +1,6 @@
 set(sources
     src/book.cpp
+    src/cart.cpp
 )
 
 set(exe_sources
