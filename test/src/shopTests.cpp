@@ -189,7 +189,7 @@ TEST(OrderBook, OrderMoreThanShopHave) {
 
     ASSERT_EQ(order.initialCart.getAllOrderedBooks(), cart1.getAllOrderedBooks());
     ASSERT_NE(order.actualCart.getAllOrderedBooks(), cart1.getAllOrderedBooks());
-    ASSERT_EQ(order.actualCart.getAllOrderedBooks()[0], 30);
+    ASSERT_EQ(order.actualCart.getAllOrderedBooks()[0].count, 30);
 }
 
 TEST(OrderBook, OrderOnlyBooksShopDoesntHave) {
