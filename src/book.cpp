@@ -71,4 +71,10 @@ bookshop::Book bookshop::createBook(const std::string& title, const std::string&
         newBook.initID();
 
         return newBook;
-    }
+}
+
+bool bookshop::Book::isBookExists(BookID id) {
+    if (id == 0 || id >= s_nextFreeID)
+        return false;
+    return true;
+}
