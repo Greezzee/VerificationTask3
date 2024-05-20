@@ -285,6 +285,27 @@ TEST(BookCopying, BookCanBeCopied) {
   ASSERT_EQ(book.getReleaseYear(), copy.getReleaseYear());
 }
 
+TEST(BookExistance, CreatedBookExists) {
+  std::string name = "Some book";
+  std::string author = "Pushkin";
+  std::string publisher = "Book Company Inc.";
+  std::string genre = "Drama";
+  size_t price = 20;
+  int releaseYear = 1811;
+
+  bookshop::Book book = bookshop::createBook(name, author, publisher, genre, price, releaseYear);
+
+  ASSERT_TRUE(bookshop::Book::isBookExists(book.getId()));
+}
+
+TEST(BookExistance, BookID0NotExists) {
+  ASSERT_FALSE(bookshop::Book::isBookExists(0));
+}
+
+TEST(BookExistance, BookWithVeryHighIDNotExists) {
+  ASSERT_FALSE(bookshop::Book::isBookExists(9999999));
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
