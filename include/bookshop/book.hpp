@@ -32,10 +32,10 @@ namespace bookshop
         friend Book createBook(const std::string& title, const std::string& author, const std::string& publisher,
                                const std::string& genre, size_t price, int release_year);
     private:
-        std::string m_title, m_author, m_publisher, m_genre;
-        int m_releaseYear; // negative numbers mean BC, positive - AD
-        size_t m_price;
-        BookID m_id;
+        std::string m_title = "", m_author = "", m_publisher = "", m_genre = "";
+        int m_releaseYear = 0; // negative numbers mean BC, positive - AD
+        size_t m_price = 0;
+        BookID m_id = 0;
 
         static size_t s_nextFreeID;      
     };
