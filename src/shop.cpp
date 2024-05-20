@@ -2,7 +2,7 @@
 
 bookshop::Bookshop::Bookshop() {}
 
-void bookshop::Bookshop::addBook(Book newBook, size_t count = 1) {
+void bookshop::Bookshop::addBook(Book newBook, size_t count) {
     if (!Book::isBookExists(newBook.getId()))
         return;
     
@@ -15,7 +15,7 @@ void bookshop::Bookshop::addBook(Book newBook, size_t count = 1) {
 std::map<bookshop::BookID, size_t> bookshop::Bookshop::getCatalog() {
     std::map<bookshop::BookID, size_t> out;
 
-    for (auto pair : m_books) {
+    for (auto&& pair : m_books) {
         out[pair.first.getId()] = pair.second;
     }
 

@@ -21,6 +21,8 @@ namespace bookshop
         int getReleaseYear() const;
         BookID getId() const;
 
+        bool operator<(const Book& other) const { return getId() < other.getId(); }
+
     protected:
 
         void setTitle(const std::string& title);
@@ -44,6 +46,7 @@ namespace bookshop
 
     Book createBook(const std::string& title, const std::string& author, const std::string& publisher,
                     const std::string& genre, size_t price, int release_year);
+
 }
 
 #endif  // BOOK_H_
