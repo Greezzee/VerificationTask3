@@ -15,4 +15,6 @@ set(headers
 
 set(test_sources
   src/bookTests.cpp
+  src/cartTests.cpp
+  src/shopTests.cpp
 )
