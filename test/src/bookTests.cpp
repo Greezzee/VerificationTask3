@@ -25,6 +25,11 @@ TEST(BookCreateTest, NormalBook)
   ASSERT_EQ(book.getReleaseYear(), releaseYear);
 }
 
+TEST(BookCreateTest, BookNotCreatedIsIncorrect) {
+  bookshop::Book book;
+  ASSERT_EQ(book.getId(), 0);
+}
+
 TEST(BookCreateTest, NamelessBookForbid)
 {
   std::string name = "";
