@@ -1,5 +1,4 @@
 set(sources
-    src/tmp.cpp
 )
 
 set(exe_sources
@@ -8,9 +7,11 @@ set(exe_sources
 )
 
 set(headers
-    include/bookshop/tmp.hpp
+    include/bookshop/book.hpp
+    include/bookshop/bookshop.hpp
+    include/bookshop/cart.hpp
 )
 
 set(test_sources
-  src/tmp_test.cpp
+  src/bookTests.cpp
 )
