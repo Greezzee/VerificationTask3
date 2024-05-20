@@ -11,6 +11,8 @@ namespace bookshop {
     {
         BookID id;
         size_t count;
+
+        bool operator==(const BookOrder& other) const {return id == other.id && count == other.count;}
     };
 
     class Cart {

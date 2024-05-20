@@ -5,25 +5,25 @@
 
 bookshop::BookID bookshop::Book::s_nextFreeID = 1;
 
-std::string bookshop::Book::getTitle() {
+std::string bookshop::Book::getTitle() const {
     return m_title;
 }
-std::string bookshop::Book::getAuthor() {
+std::string bookshop::Book::getAuthor() const {
     return m_author;
 }
-std::string bookshop::Book::getPublisher() {
+std::string bookshop::Book::getPublisher() const {
     return m_publisher;
 }
-std::string bookshop::Book::getGenre() {
+std::string bookshop::Book::getGenre() const {
     return m_genre;
 }
-size_t bookshop::Book::getPrice() {
+size_t bookshop::Book::getPrice() const {
     return m_price;
 }
-int bookshop::Book::getReleaseYear() {
+int bookshop::Book::getReleaseYear() const {
     return m_releaseYear;
 }
-bookshop::BookID bookshop::Book::getId() {
+bookshop::BookID bookshop::Book::getId() const {
     return m_id;
 }
 
