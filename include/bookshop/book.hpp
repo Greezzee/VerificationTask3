@@ -13,13 +13,13 @@ namespace bookshop
 
         static bool isBookExists(BookID id);
 
-        std::string getTitle();
-        std::string getAuthor();
-        std::string getPublisher();
-        std::string getGenre();
-        size_t getPrice();
-        int getReleaseYear();
-        size_t getId();
+        std::string getTitle() const;
+        std::string getAuthor() const;
+        std::string getPublisher() const;
+        std::string getGenre() const;
+        size_t getPrice() const;
+        int getReleaseYear() const;
+        BookID getId() const;
 
     protected:
 
