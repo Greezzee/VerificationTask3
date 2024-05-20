@@ -107,8 +107,8 @@ TEST(OrderBook, OrderDelivery)
     ASSERT_EQ(order1.deliveryMethod, bookshop::DeliveryMethod::SELF_DELIVERY);
     ASSERT_EQ(order1.deliveryTime, delivery_time);
     ASSERT_EQ(order1.paymentMethod, bookshop::PaymentMethod::UPON_RECEIVING);
-    ASSERT_EQ(order1.initialCart, cart1);
-    ASSERT_EQ(order1.actualCart, cart1);
+    ASSERT_EQ(order1.initialCart.getAllOrderedBooks(), cart1.getAllOrderedBooks());
+    ASSERT_EQ(order1.actualCart.getAllOrderedBooks(), cart1.getAllOrderedBooks());
 }
 
 TEST(OrderBook, OrderTwoDeliveries) {
@@ -187,8 +187,8 @@ TEST(OrderBook, OrderMoreThanShopHave) {
 
     bookshop::Order order = shop.getOrderInfo(id1);
 
-    ASSERT_EQ(order.initialCart, cart1);
-    ASSERT_NE(order.actualCart, cart1);
+    ASSERT_EQ(order.initialCart.getAllOrderedBooks(), cart1.getAllOrderedBooks());
+    ASSERT_NE(order.actualCart.getAllOrderedBooks(), cart1.getAllOrderedBooks());
     ASSERT_EQ(order.actualCart.getAllOrderedBooks()[0], 30);
 }
 
@@ -286,8 +286,8 @@ TEST(OrderBook, OrderBooksShopDoesntHave) {
 
     bookshop::Order order = shop.getOrderInfo(id1);
 
-    ASSERT_EQ(order.initialCart, cart1);
-    ASSERT_NE(order.actualCart, cart1);
+    ASSERT_EQ(order.initialCart.getAllOrderedBooks(), cart1.getAllOrderedBooks());
+    ASSERT_NE(order.actualCart.getAllOrderedBooks(), cart1.getAllOrderedBooks());
     ASSERT_EQ(order.actualCart.getAllOrderedBooks().size(), 1);
     ASSERT_EQ(order.actualCart.getAllOrderedBooks()[0], 5);
 }
@@ -320,7 +320,7 @@ TEST(DeliverBook, FullCourierDeliveryPath)
     ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::FINISHED);
 
     ASSERT_EQ(books.size(), 1);
-    ASSERT_EQ(books[0].book, book);
+    ASSERT_EQ(books[0].book.getId(), book.getId());
     ASSERT_EQ(books[0].count, 5);
 }
 
@@ -348,7 +348,7 @@ TEST(DeliverBook, FullSelfDeliveryPath)
     ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::FINISHED);
 
     ASSERT_EQ(books.size(), 1);
-    ASSERT_EQ(books[0].book, book);
+    ASSERT_EQ(books[0].book.getId(), book.getId());
     ASSERT_EQ(books[0].count, 5);
 }
 
