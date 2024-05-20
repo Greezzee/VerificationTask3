@@ -1,4 +1,5 @@
 set(sources
+    src/book.cpp
 )
 
 set(exe_sources
@@ -8,7 +9,7 @@ set(exe_sources
 
 set(headers
     include/bookshop/book.hpp
-    include/bookshop/bookshop.hpp
+    include/bookshop/shop.hpp
     include/bookshop/cart.hpp
 )
 

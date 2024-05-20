@@ -27,8 +27,10 @@ namespace bookshop
         void setGenre(const std::string& genre);
         void setPrice(size_t price);
         void setReleaseYear(int release_year);
+        void initID();
 
-        friend Book createBook();
+        friend Book createBook(const std::string& title, const std::string& author, const std::string& publisher,
+                               const std::string& genre, size_t price, int release_year);
     private:
         std::string m_title, m_author, m_publisher, m_genre;
         int m_releaseYear; // negative numbers mean BC, positive - AD
