@@ -6,13 +6,20 @@
 
 namespace bookshop {
 
+    struct BookOrder
+    {
+        BookID id;
+        size_t count;
+    };
+
     class Cart {
     public:
         Cart();
 
-        void addBook(BookID book_id);
+        void addBook(BookID book_id, size_t count = 0);
 
-        std::vector<BookID> getAllOrderedBooks();
+        std::vector<BookOrder> getAllOrderedBooks();
+
     };
 
 } // namespace bookshop

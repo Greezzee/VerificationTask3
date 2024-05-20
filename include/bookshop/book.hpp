@@ -11,6 +11,8 @@ namespace bookshop
     {
     public:
 
+        static bool isBookExists(BookID id);
+
         std::string getTitle();
         std::string getAuthor();
         std::string getPublisher();
