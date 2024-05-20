@@ -1,5 +1,6 @@
 set(sources
     src/book.cpp
+    src/cart.cpp
 )
 
 set(exe_sources
@@ -15,4 +16,5 @@ set(headers
 
 set(test_sources
   src/bookTests.cpp
+  src/cartTests.cpp
 )
