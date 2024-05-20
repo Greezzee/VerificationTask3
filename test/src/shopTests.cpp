@@ -289,7 +289,7 @@ TEST(OrderBook, OrderBooksShopDoesntHave) {
     ASSERT_EQ(order.initialCart.getAllOrderedBooks(), cart1.getAllOrderedBooks());
     ASSERT_NE(order.actualCart.getAllOrderedBooks(), cart1.getAllOrderedBooks());
     ASSERT_EQ(order.actualCart.getAllOrderedBooks().size(), 1);
-    ASSERT_EQ(order.actualCart.getAllOrderedBooks()[0], 5);
+    ASSERT_EQ(order.actualCart.getAllOrderedBooks()[0].count, 5);
 }
 
 TEST(DeliverBook, FullCourierDeliveryPath)
