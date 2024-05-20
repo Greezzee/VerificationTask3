@@ -69,7 +69,7 @@ TEST(AddNewBookToShop, AddSeveralDifferentBooks)
     auto catalog = shop.getCatalog();
     ASSERT_EQ(catalog.size(), 20);
     for (auto book_data : catalog)
-        ASSERT_EQ(book_data.first, 1);
+        ASSERT_EQ(book_data.second, 1);
 }
 
 TEST(AddNewBookToShop, AddNotCreatedBook)
