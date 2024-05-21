@@ -48,8 +48,10 @@ namespace bookshop {
 
         OrderID id = 0;
         OrderStatus status;
-        Cart initialCart; // what was initially ordered/refunded
+        Cart initialCart; // what was initially ordered
         Cart actualCart; // what will be delivered/refunded
+
+        RefundType refundType = RefundType::UNDELIVERED_ORDER_REFUND;
     };
 
     struct BooksPack {

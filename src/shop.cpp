@@ -31,9 +31,6 @@ bookshop::OrderID bookshop::Bookshop::makeDeliveryOrder(Cart cart, DeliveryMetho
     for (auto& bookOrder : cart.getAllOrderedBooks()) {
         if (m_booksByID.find(bookOrder.id) == m_booksByID.end())
             continue;
-        
-        if (m_books.find(m_booksByID[bookOrder.id]) == m_books.end())
-            continue;
 
         auto& foundBook = m_books[m_booksByID[bookOrder.id]];
 
@@ -109,4 +106,55 @@ std::vector<bookshop::BooksPack> bookshop::Bookshop::transferToBuyer(OrderID id)
     }
 
     return out;
+}
+
+void bookshop::Bookshop::initiateRefund(OrderID id, RefundType refundType, std::string from_addr) {
+    if (m_orders.find(id) == m_orders.end())
+        return;
+    
+    auto& order = m_orders[id];
+
+    if (refundType == RefundType::UNDELIVERED_ORDER_REFUND && 
+       (order.status == OrderStatus::ACCEPTED ||
+        order.status == OrderStatus::AWAITING_PICKUP ||
+        order.status == OrderStatus::IN_DELIVERY)) {
+
+        order.refundType = RefundType::UNDELIVERED_ORDER_REFUND;
+        order.status = OrderStatus::REFUND_INITIATED;   
+    }
+    else if (refundType == RefundType::SELF_REFUND && order.status == OrderStatus::FINISHED) {
+        order.refundType = RefundType::SELF_REFUND;
+        order.status = OrderStatus::REFUND_INITIATED;   
+    }
+    else if (refundType == RefundType::COURIER_REFUND && order.status == OrderStatus::FINISHED && !from_addr.empty()) {
+        order.refundType = RefundType::COURIER_REFUND;
+        order.status = OrderStatus::REFUND_INITIATED;  
+        order.deliveryAddress = from_addr;
+    }
+
+}
+
+void bookshop::Bookshop::deliverRefund(OrderID id) {
+    if (m_orders.find(id) == m_orders.end())
+        return;
+    
+    auto& order = m_orders[id];
+
+    if (order.status == OrderStatus::REFUND_INITIATED && order.refundType != RefundType::UNDELIVERED_ORDER_REFUND)
+        order.status = OrderStatus::REFUND_IN_PROCESS;
+}
+
+void bookshop::Bookshop::finishRefund(OrderID id) {
+    if (m_orders.find(id) == m_orders.end())
+        return;
+    
+    auto& order = m_orders[id];
+
+    if (order.status == OrderStatus::REFUND_INITIATED && order.refundType == RefundType::UNDELIVERED_ORDER_REFUND ||
+        order.status == OrderStatus::REFUND_IN_PROCESS && order.refundType != RefundType::UNDELIVERED_ORDER_REFUND) {
+
+            order.status = OrderStatus::REFUNDED;
+            for (auto book_order : order.actualCart.getAllOrderedBooks())
+                addBook(m_booksByID[book_order.id], book_order.count);
+    }
 }
