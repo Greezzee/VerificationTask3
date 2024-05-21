@@ -665,6 +665,48 @@ TEST(Refund, RefundInitiationToAlreadyRefundedOrder)
     ASSERT_EQ(shop.getCatalog()[book.getId()], 30);
 }
 
+TEST(Refund, RefundNotExistingOrder)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "", 0);
+    bookshop::OrderID bad_id = 9999999;
+    shop.initiateRefund(bad_id, bookshop::RefundType::SELF_REFUND);
+    ASSERT_EQ(shop.getOrderStatus(bad_id), bookshop::OrderStatus::NO_STATUS);
+    shop.deliverRefund(bad_id);
+    ASSERT_EQ(shop.getOrderStatus(bad_id), bookshop::OrderStatus::NO_STATUS);
+    shop.finishRefund(bad_id);
+    ASSERT_EQ(shop.getOrderStatus(bad_id), bookshop::OrderStatus::NO_STATUS);
+}
+
+TEST(Refund, RefundIncorrectOrder)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "", 0);
+    bookshop::OrderID bad_id = 0;
+    shop.initiateRefund(bad_id, bookshop::RefundType::SELF_REFUND);
+    ASSERT_EQ(shop.getOrderStatus(bad_id), bookshop::OrderStatus::NO_STATUS);
+    shop.deliverRefund(bad_id);
+    ASSERT_EQ(shop.getOrderStatus(bad_id), bookshop::OrderStatus::NO_STATUS);
+    shop.finishRefund(bad_id);
+    ASSERT_EQ(shop.getOrderStatus(bad_id), bookshop::OrderStatus::NO_STATUS);
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
