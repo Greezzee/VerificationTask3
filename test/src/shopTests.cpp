@@ -526,7 +526,7 @@ TEST(Refund, UndeliveredRefundNormalWork)
     ASSERT_EQ(shop.getCatalog()[book.getId()], 30);
 }
 
-TEST(Refund, UndeliveredRefundNormalWork)
+TEST(Refund, UndeliveredRefundNormalWorkAfterDelivery)
 {
     bookshop::Bookshop shop;
     bookshop::Book book = createNewUniqueBook();
