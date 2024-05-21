@@ -429,7 +429,7 @@ TEST(DeliverBook, StatusOfUnexistingOrder)
 TEST(DeliverBook, InfoOfUnexistingOrder)
 {
     bookshop::Bookshop shop;
-    bppkshop::Order order = shop.getOrderInfo(99999999);
+    bookshop::Order order = shop.getOrderInfo(99999999);
     ASSERT_EQ(order.id, 0);
 }
 
