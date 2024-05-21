@@ -228,6 +228,31 @@ TEST(OrderBook, OrderWithEmptyCart) {
     ASSERT_EQ(id1, 0);
 }
 
+TEST(OrderBook, OrderButAllBooksRanOut) {
+    std::string delivery_addr = "Pushkin's street";
+    time_t delivery_time = std::time(nullptr) + 60 * 60 * 24;
+
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 1);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 1);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                delivery_addr,
+                                delivery_time);
+
+    bookshop::OrderID id2 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                delivery_addr,
+                                delivery_time);
+
+    ASSERT_EQ(id2, 0);
+}
+
 TEST(OrderBook, OrderCourierToThePast) {
     std::string delivery_addr = "Pushkin's street";
     time_t delivery_time = std::time(nullptr) - 60 * 60 * 24;
@@ -253,6 +278,7 @@ TEST(OrderBook, OrderCourierWithoutAddr) {
 
     bookshop::Bookshop shop;
     bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book);
 
     bookshop::Cart cart1;
     cart1.addBook(book.getId());
@@ -391,6 +417,37 @@ TEST(DeliverBook, DeliverAfterTransfer)
     auto books = shop.transferToBuyer(id1);
     shop.deliver(id1);
     ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::FINISHED);
+}
+
+TEST(DeliverBook, StatusOfUnexistingOrder)
+{
+    bookshop::Bookshop shop;
+
+    ASSERT_EQ(shop.getOrderStatus(999999999), bookshop::OrderStatus::NO_STATUS);
+}
+
+TEST(DeliverBook, InfoOfUnexistingOrder)
+{
+    bookshop::Bookshop shop;
+    bppkshop::Order order = shop.getOrderInfo(99999999);
+    ASSERT_EQ(order.id, 0);
+}
+
+TEST(DeliverBook, DeliverUnexistingProject)
+{
+    bookshop::OrderID id = 99999999;
+    bookshop::Bookshop shop;
+    shop.deliver(id);
+    ASSERT_EQ(shop.getOrderStatus(id), bookshop::OrderStatus::NO_STATUS);
+}
+
+TEST(DeliverBook, TransferUnexistingProject)
+{
+    bookshop::OrderID id = 99999999;
+    bookshop::Bookshop shop;
+    auto bookpack = shop.transferToBuyer(id);
+    ASSERT_EQ(shop.getOrderStatus(id), bookshop::OrderStatus::NO_STATUS);
+    ASSERT_TRUE(bookpack.empty());
 }
 
 int main(int argc, char **argv)
