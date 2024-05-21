@@ -27,8 +27,16 @@ namespace bookshop {
         AWAITING_PICKUP,
         IN_DELIVERY,
         FINISHED,
-        PARTIALLY_REFUNDED,
-        FULLY_REFUNDED,
+
+        REFUND_INITIATED,
+        REFUND_IN_PROCESS,
+        REFUNDED,
+    };
+
+    enum class RefundType {
+        SELF_REFUND,
+        COURIER_REFUND,
+        UNDELIVERED_ORDER_REFUND
     };
 
     struct Order {
@@ -62,6 +70,10 @@ namespace bookshop {
 
         void deliver(OrderID id);
         std::vector<BooksPack> transferToBuyer(OrderID id);
+
+        void initiateRefund(OrderID id, RefundType refundType, std::string from_addr = "");
+        void deliverRefund(OrderID id);
+        void finishRefund(OrderID id);
 
     private:
         std::map<Book, size_t> m_books; // contains all books existed in the shop (even if not it haven't it) and its amount

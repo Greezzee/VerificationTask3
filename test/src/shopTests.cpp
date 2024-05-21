@@ -450,6 +450,221 @@ TEST(DeliverBook, TransferUnexistingProject)
     ASSERT_TRUE(bookpack.empty());
 }
 
+TEST(Refund, SelfRefundNormalWork)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "", 0);
+    
+    shop.deliver(id1);
+    shop.transferToBuyer(id1);
+
+    shop.initiateRefund(id1, bookshop::RefundType::SELF_REFUND);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUND_INITIATED);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 25);
+    shop.deliverRefund(id1);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUND_IN_PROCESS);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 25);
+    shop.finishRefund(id1);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUNDED);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 30);
+}
+
+TEST(Refund, CourierRefundNormalWork)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "", 0);
+    
+    shop.deliver(id1);
+    shop.transferToBuyer(id1);
+
+    shop.initiateRefund(id1, bookshop::RefundType::COURIER_REFUND, "my addr");
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUND_INITIATED);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 25);
+    ASSERT_EQ(shop.getOrderInfo(id1).deliveryAddress, "my addr");
+    shop.deliverRefund(id1);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUND_IN_PROCESS);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 25);
+    shop.finishRefund(id1);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUNDED);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 30);
+}
+
+TEST(Refund, UndeliveredRefundNormalWork)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "", 0);
+    
+    shop.initiateRefund(id1, bookshop::RefundType::UNDELIVERED_ORDER_REFUND);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUND_INITIATED);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 25);
+    shop.finishRefund(id1);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUNDED);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 30);
+}
+
+TEST(Refund, UndeliveredRefundNormalWork)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "", 0);
+    shop.deliver(id1);
+
+    shop.initiateRefund(id1, bookshop::RefundType::UNDELIVERED_ORDER_REFUND);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUND_INITIATED);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 25);
+    shop.finishRefund(id1);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUNDED);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 30);
+}
+
+TEST(Refund, UndeliveredRefundToDeliveredOrder)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "", 0);
+    shop.deliver(id1);
+    shop.transferToBuyer(id1);
+    shop.initiateRefund(id1, bookshop::RefundType::UNDELIVERED_ORDER_REFUND);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::FINISHED);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 25);
+}
+
+TEST(Refund, SelfRefundToUnpickedOrder)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "", 0);
+    shop.deliver(id1);
+    shop.initiateRefund(id1, bookshop::RefundType::SELF_REFUND);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::AWAITING_PICKUP);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 25);
+}
+
+TEST(Refund, SelfRefundToUndeliveredOrder)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::COURIER_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "addr", std::time(nullptr) + 100000);
+    shop.deliver(id1);
+    shop.initiateRefund(id1, bookshop::RefundType::SELF_REFUND);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::IN_DELIVERY);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 25);
+}
+
+TEST(Refund, CourierRefundToUnpickedOrder)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "", 0);
+    shop.deliver(id1);
+    shop.initiateRefund(id1, bookshop::RefundType::COURIER_REFUND, "addr");
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::AWAITING_PICKUP);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 25);
+}
+
+TEST(Refund, CourierRefundToUndeliveredOrder)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::COURIER_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "addr", std::time(nullptr) + 100000);
+    shop.deliver(id1);
+    shop.initiateRefund(id1, bookshop::RefundType::COURIER_REFUND, "addr");
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::IN_DELIVERY);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 25);
+}
+
+TEST(Refund, RefundInitiationToAlreadyRefundedOrder)
+{
+    bookshop::Bookshop shop;
+    bookshop::Book book = createNewUniqueBook();
+    shop.addBook(book, 30);
+
+    bookshop::Cart cart1;
+    cart1.addBook(book.getId(), 5);
+    bookshop::OrderID id1 = shop.makeDeliveryOrder(cart1, 
+                                bookshop::DeliveryMethod::SELF_DELIVERY,
+                                bookshop::PaymentMethod::UPON_RECEIVING,
+                                "", 0);
+    
+    shop.deliver(id1);
+    shop.transferToBuyer(id1);
+
+    shop.initiateRefund(id1, bookshop::RefundType::SELF_REFUND);
+    shop.deliverRefund(id1);
+    shop.finishRefund(id1);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUNDED);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 30);
+    shop.initiateRefund(id1, bookshop::RefundType::SELF_REFUND);
+    ASSERT_EQ(shop.getOrderStatus(id1), bookshop::OrderStatus::REFUNDED);
+    ASSERT_EQ(shop.getCatalog()[book.getId()], 30);
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
