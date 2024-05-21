@@ -22,6 +22,7 @@ namespace bookshop {
     };
 
     enum class OrderStatus {
+        NO_STATUS,
         ACCEPTED,
         AWAITING_PICKUP,
         IN_DELIVERY,
@@ -37,7 +38,7 @@ namespace bookshop {
         std::string deliveryAddress;
         time_t deliveryTime;
 
-        OrderID id;
+        OrderID id = 0;
         OrderStatus status;
         Cart initialCart; // what was initially ordered/refunded
         Cart actualCart; // what will be delivered/refunded
@@ -64,8 +65,11 @@ namespace bookshop {
 
     private:
         std::map<Book, size_t> m_books; // contains all books existed in the shop (even if not it haven't it) and its amount
+        std::map<BookID, Book> m_booksByID;
 
         std::map<OrderID, Order> m_orders;
+
+        static OrderID s_nextFreeOrderID;
     };
 
 } // namespace bookshop
