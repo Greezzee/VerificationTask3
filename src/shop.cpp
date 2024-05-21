@@ -135,9 +135,26 @@ void bookshop::Bookshop::initiateRefund(OrderID id, RefundType refundType, std::
 }
 
 void bookshop::Bookshop::deliverRefund(OrderID id) {
+    if (m_orders.find(id) == m_orders.end())
+        return;
+    
+    auto& order = m_orders[id];
 
+    if (order.status == OrderStatus::REFUND_INITIATED && order.refundType != RefundType::UNDELIVERED_ORDER_REFUND)
+        order.status = OrderStatus::REFUND_IN_PROCESS;
 }
 
 void bookshop::Bookshop::finishRefund(OrderID id) {
+    if (m_orders.find(id) == m_orders.end())
+        return;
+    
+    auto& order = m_orders[id];
 
+    if (order.status == OrderStatus::REFUND_INITIATED && order.refundType == RefundType::UNDELIVERED_ORDER_REFUND ||
+        order.status == OrderStatus::REFUND_IN_PROCESS && order.refundType != RefundType::UNDELIVERED_ORDER_REFUND) {
+
+            order.status = OrderStatus::REFUNDED;
+            for (auto book_order : order.actualCart.getAllOrderedBooks())
+                addBook(m_booksByID[book_order.id], book_order.count);
+    }
 }
